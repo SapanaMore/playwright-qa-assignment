@@ -1,0 +1,80 @@
+Test Case ID,Module,Title,Preconditions,Test Steps,Test Data,Expected Result,Actual Result,Status,Priority,Test Type,Automation Candidate
+TC-001,Auth API,Valid login returns token,API is accessible,"1. Send POST to /auth/login with valid credentials
+2. Check response status
+3. Verify response body contains token","username: admin, password: password",200 status; response body contains non-empty token string,,Pass,Critical,Smoke,Yes
+TC-002,Auth API,Invalid credentials returns error,API is accessible,"1. Send POST to /auth/login with wrong credentials
+2. Check response status
+3. Verify no token in body","username: wronguser, password: wrongpass","200 status; body contains error message (e.g. ""Invalid credentials""); no token returned",,Pass,High,Negative,Yes
+TC-003,Auth API,Empty credentials returns error,API is accessible,"1. Send POST to /auth/login with empty body {}
+2. Check response","Empty JSON body: {}","Error response with no token; status 200 with error message or 400",,Pass,Medium,Boundary,Yes
+TC-004,Booking API,GET all bookings for room returns array,Auth token obtained; room exists,"1. Send GET /booking?roomid={id} with token
+2. Verify status 200
+3. Verify body contains bookings array",roomid: existing room ID,"200 status; body has bookings array; each item has bookingid, roomid, firstname, lastname",,Pass,Critical,Functional,Yes
+TC-005,Booking API,POST valid booking returns created booking,Auth token obtained; room exists,"1. Send POST /booking with full valid payload
+2. Verify 201 status
+3. Verify bookingid returned
+4. Verify all fields match","roomid: 1, firstname: Test, lastname: QA, depositpaid: true, checkin: future date, checkout: future+3","201 status; body includes bookingid; firstname, lastname, roomid, depositpaid, bookingdates match input",,Pass,Critical,Functional,Yes
+TC-006,Booking API,POST booking with missing firstname returns validation error,API is accessible,"1. Send POST /booking without firstname field
+2. Verify error response","Payload missing firstname field","400 or error response; body contains validation error mentioning firstname",,Pass,High,Negative,Yes
+TC-007,Booking API,POST booking with checkin after checkout returns error,API is accessible,"1. Send POST /booking with checkin date after checkout
+2. Verify error response","checkin: 2029-06-10, checkout: 2029-06-05","Error response; booking not created; body has error message",,Pass,High,Boundary,Yes
+TC-008,Booking API,PUT booking without token returns 401/403,Booking exists,"1. Send PUT /booking/{id} without auth token
+2. Verify rejection",Valid booking payload but no Cookie header,"401 or 403 status; booking not modified",,Pass,Critical,Security,Yes
+TC-009,Booking API,DELETE booking with token then GET returns 404,Auth token obtained; booking exists,"1. Send DELETE /booking/{id} with token
+2. Verify success
+3. Send GET /booking/{id}
+4. Verify 404",Existing bookingId with valid token,"DELETE returns 200/201; subsequent GET returns 404",,Pass,Critical,Functional,Yes
+TC-010,Room API,GET all rooms returns room list,API is accessible,"1. Send GET /room
+2. Verify 200 status
+3. Verify rooms array with expected fields",None,"200 status; body has rooms array; each room has roomid, roomName, type, roomPrice",,Pass,High,Smoke,Yes
+TC-011,Room API,POST room without token returns 401/403,API is accessible,"1. Send POST /room with valid room data but no token
+2. Verify rejection",Valid room payload but no Cookie header,"401 or 403 status; room not created",,Pass,High,Security,Yes
+TC-012,Message API,Guest sends message and admin reads it,API is accessible,"1. POST /message with valid data (no auth)
+2. GET /message with admin token
+3. Find the created message
+4. GET /message/{id} with token","name: User123, email: user@example.com, phone: 12345678901, subject: Inquiry, description: message text","POST returns 200; GET list includes message; GET by id returns full message details",,Pass,High,Functional,Yes
+TC-013,Branding API,GET branding returns site info,API is accessible,"1. Send GET /branding
+2. Verify 200
+3. Verify name and description fields present",None,"200 status; body has name, description, logoUrl, map fields",,Pass,Medium,Smoke,Yes
+TC-014,Branding API,PUT branding without token returns 401/403,API is accessible,"1. Send PUT /branding with new name but no token
+2. Verify rejection","name: Unauthorized Update, no Cookie header","401 or 403 status; branding not modified",,Pass,High,Security,Yes
+TC-015,UI - Frontend,Homepage loads with banner and rooms,Browser open,"1. Navigate to homepage
+2. Verify welcome banner visible
+3. Verify room listings displayed
+4. Verify room images rendered",None,"Welcome banner is visible; at least one room card with image is displayed",,Pass,Critical,Smoke,Yes
+TC-016,UI - Frontend,Happy path booking flow,Browser open; homepage loaded,"1. Click Book this room
+2. Select dates via calendar drag
+3. Fill firstname lastname email phone
+4. Click Book
+5. Verify success message","firstname: Test, lastname: Automation, email: test@example.com, phone: 12345678901","Booking Successful banner/modal is displayed",,Pass,Critical,Functional,Yes
+TC-017,UI - Frontend,Empty booking form shows validation errors,Browser open; booking form visible,"1. Open booking form
+2. Select dates
+3. Submit without filling any fields
+4. Verify errors appear",All fields empty,"Validation errors displayed for all required fields (firstname, lastname, email, phone)",,Pass,High,Negative,Yes
+TC-018,UI - Contact,Valid contact form submission,Browser open; homepage loaded,"1. Scroll to contact form
+2. Fill name email phone subject message
+3. Click Submit
+4. Verify success","name: John Doe, email: john@example.com, phone: 12345678901, subject: Inquiry, message: Hello","Success message 'Thanks for getting in touch' is displayed",,Pass,High,Functional,Yes
+TC-019,UI - Contact,Empty contact form shows validation errors,Browser open; homepage loaded,"1. Click Submit without filling any fields
+2. Verify validation errors",All fields empty,"Validation errors visible on all required fields",,Pass,Medium,Negative,Yes
+TC-020,UI - Admin,Valid admin login shows dashboard,Browser open,"1. Navigate to /admin
+2. Enter admin / password
+3. Click Login
+4. Verify dashboard loads","username: admin, password: password","Dashboard visible with Logout button, room creation form, and room list",,Pass,Critical,Smoke,Yes
+TC-021,UI - Admin,Invalid admin login shows error,Browser open,"1. Navigate to /admin
+2. Enter wrong credentials
+3. Click Login
+4. Verify error shown","username: wrong, password: wrong","Error message displayed; no redirect to dashboard",,Pass,High,Negative,Yes
+TC-022,UI - Admin,Create room via admin panel,Logged in as admin,"1. Fill room name type price accessible
+2. Click Create
+3. Verify room appears in list","name: TestRoom, type: Double, accessible: true, price: 175","Room row appears in room listing with correct details",,Pass,Critical,Functional,Yes
+TC-023,UI - Admin,Delete room via admin panel,Logged in as admin; room exists,"1. Find room in list
+2. Click delete button
+3. Verify room removed from list",Room name to delete,"Room no longer appears in the room listing",,Pass,High,Functional,Yes
+TC-024,UI - Admin,Logout clears session and redirects to login,Logged in as admin,"1. Click Logout
+2. Verify login page shown
+3. Navigate to /admin
+4. Verify login page (not dashboard)",None,"After logout login form is shown; direct /admin access shows login not dashboard",,Pass,High,Regression,Yes
+TC-025,UI - Admin,Admin login with empty fields,Browser open,"1. Navigate to /admin
+2. Click Login without entering credentials
+3. Check for validation",Both fields empty,"Validation error shown or login page remains with no redirect",,Pass,Medium,Negative,Yes

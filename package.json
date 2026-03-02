@@ -1,0 +1,29 @@
+{
+  "name": "playwright-qa-assignment",
+  "version": "1.0.0",
+  "description": "QA Automation Suite for Restful-Booker Platform — API + UI Testing with Playwright",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:api": "npx playwright test --project=API",
+    "test:ui": "npx playwright test --project=UI",
+    "report": "npx playwright show-report"
+  },
+  "keywords": [
+    "playwright",
+    "qa",
+    "automation",
+    "testing",
+    "api",
+    "ui"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.41.0",
+    "@types/node": "^20.0.0",
+    "dotenv": "^16.3.1",
+    "typescript": "^5.3.3"
+  }
+}
